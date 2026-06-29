@@ -1,0 +1,22 @@
+html,
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+:host {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.workspace {
+    flex: 1;
+
+    display: flex;
+
+    overflow: hidden;
+}

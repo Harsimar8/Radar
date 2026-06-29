@@ -1,0 +1,39 @@
+<div class="toolbar">
+
+    <button (click)="simulationService.setTool(EditorTool.Select)">
+        Select
+    </button>
+
+    <button (click)="simulationService.setTool(EditorTool.Aircraft)">
+        Aircraft
+    </button>
+
+    <button (click)="simulationService.setTool(EditorTool.Radar)">
+        Radar
+    </button>
+
+    <button (click)="simulationService.setTool(EditorTool.SamBattery)">
+        SAM
+    </button>
+
+    <button (click)="simulationService.setTool(EditorTool.Missile)">
+        Missile
+    </button>
+
+    <button (click)="simulationService.setTool(EditorTool.GroundTarget)">
+        Ground Target
+    </button>
+
+    <span class="spacer"></span>
+
+    <button
+        (click)="simulationService.setView(ViewMode.Leaflet)">
+        2D
+    </button>
+
+    <button
+        (click)="simulationService.setView(ViewMode.Cesium)">
+        3D
+    </button>
+
+</div>

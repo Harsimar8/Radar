@@ -1,0 +1,11 @@
+<div class="map-container">
+
+  @if (simulationService.currentView() === ViewMode.Leaflet) {
+    <app-leaflet-map></app-leaflet-map>
+  }
+
+  @if (simulationService.currentView() === ViewMode.Cesium) {
+    <app-cesium-map></app-cesium-map>
+  }
+
+</div>

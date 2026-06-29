@@ -1,0 +1,24 @@
+import { Component, signal } from '@angular/core';
+
+import { Toolbar } from './components/toolbar/toolbar';
+import { PropertyPanel } from './components/property-panel/property-panel';
+import { EntityList } from './components/entity-list/entity-list';
+import { MapComponent } from './components/map/map';
+import { StatusBar } from './components/status-bar/status-bar';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    Toolbar,
+    MapComponent,
+    PropertyPanel,
+    EntityList,
+    StatusBar
+  ],
+  templateUrl: './app.html',
+  styleUrl: './app.css'
+})
+export class App {
+  protected readonly title = signal('AirDefense');
+}
