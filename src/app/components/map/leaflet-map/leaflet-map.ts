@@ -65,6 +65,31 @@ export class LeafletMap implements AfterViewInit {
 
     });
 
+    effect(() => {
+
+  const camera = this.mapSyncService.center();
+
+  if (!this.map) {
+    return;
+  }
+
+  // Ignore updates that originated from Leaflet
+  if (camera.source === 'leaflet') {
+    return;
+  }
+
+  this.map.setView(
+    [camera.latitude, camera.longitude],
+    camera.zoom,
+    {
+      animate: false
+    }
+  );
+
+});
+
+    
+
   }
 
   ngAfterViewInit(): void {
@@ -89,15 +114,16 @@ export class LeafletMap implements AfterViewInit {
       5
     );
 
-    this.map.on('moveend zoomend', () => {
+      this.map.on('moveend zoomend', () => {
 
   const center = this.map.getCenter();
 
-  this.mapSyncService.update(
-    center.lat,
-    center.lng,
-    this.map.getZoom()
-  );
+this.mapSyncService.update(
+  center.lat,
+  center.lng,
+  this.map.getZoom(),
+  'leaflet'
+);
 
 });
 

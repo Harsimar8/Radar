@@ -123,6 +123,7 @@ this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
   this.initializeClickHandler();
 
   this.initializeSelectionHandler();
+  this.initializeCameraSync();
 
   this.drawEntities();
 
@@ -392,7 +393,39 @@ scaleByDistance: new Cesium.NearFarScalar(
     }
 
   }
+   private initializeCameraSync(): void {
 
+  this.viewer.camera.changed.addEventListener(() => {
+
+    const cartographic =
+      Cesium.Cartographic.fromCartesian(
+        this.viewer.camera.position
+      );
+
+    const latitude =
+      Cesium.Math.toDegrees(cartographic.latitude);
+
+    const longitude =
+      Cesium.Math.toDegrees(cartographic.longitude);
+
+    const height =
+      cartographic.height;
+
+    const zoom =
+      Math.round(
+        Math.log2(20000000 / height)
+      );
+
+    this.mapSyncService.update(
+  latitude,
+  longitude,
+  zoom,
+  'cesium'
+);
+
+  });
+
+}
 
   private getCameraHeight(zoom: number): number {
 
