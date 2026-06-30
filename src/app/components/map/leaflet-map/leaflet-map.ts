@@ -128,35 +128,61 @@ export class LeafletMap implements AfterViewInit {
 
   private placeAircraft(lat: number, lng: number): void {
 
-    const aircraft = new Aircraft(
-      IdGenerator.generate('Aircraft'),
-      'Aircraft',
-      new Position(
-        lat,
-        lng,
-        10000
-      )
-    );
+  const selected = this.simulationService.selectedTemplate();
 
-    this.entityService.addEntity(aircraft);
+  const aircraft = new Aircraft(
 
-  }
+    IdGenerator.generate('Aircraft'),
 
-  private placeRadar(lat: number, lng: number): void {
+    selected?.name ?? 'Aircraft',
 
-    const radar = new Radar(
-      IdGenerator.generate('Radar'),
-      'Radar',
-      new Position(
-        lat,
-        lng,
-        0
-      )
-    );
+    new Position(
 
-    this.entityService.addEntity(radar);
+      lat,
 
-  }
+      lng,
+
+      selected?.altitude ?? 10000
+
+    ),
+
+    selected?.speed ?? 0,
+
+    selected?.heading ?? 0
+
+  );
+
+  this.entityService.addEntity(aircraft);
+
+}
+
+   private placeRadar(lat: number, lng: number): void {
+
+  const selected = this.simulationService.selectedTemplate();
+
+  const radar = new Radar(
+
+    IdGenerator.generate('Radar'),
+
+    selected?.name ?? 'Radar',
+
+    new Position(
+
+      lat,
+
+      lng,
+
+      0
+
+    ),
+
+    selected?.range ?? 50000
+
+  );
+
+  this.entityService.addEntity(radar);
+
+}
 
   private redrawEntities(): void {
 
@@ -189,17 +215,23 @@ export class LeafletMap implements AfterViewInit {
 
     }
 
-    L.marker(
-      [
-        entity.position.latitude,
-        entity.position.longitude
-      ],
-      {
-        icon
-      }
-    )
-      .bindPopup(entity.name)
-      .addTo(this.markers);
+    const marker = L.marker(
+  [
+    entity.position.latitude,
+    entity.position.longitude
+  ],
+  {
+    icon
+  }
+);
+
+marker.bindPopup(entity.name);
+
+marker.on('click', () => {
+  this.simulationService.selectEntity(entity);
+});
+
+marker.addTo(this.markers);
 
     if (entity.type === EntityType.Radar) {
 

@@ -42,4 +42,21 @@ export class EntityService {
     localStorage.removeItem(this.STORAGE_KEY);
   }
 
+  updateEntity(entity: Entity) {
+
+  this.entities.update(list =>
+    list.map(e => e.id === entity.id ? entity : e)
+  );
+
 }
+
+removeEntity(id: string) {
+
+  this.entities.update(list =>
+    list.filter(entity => entity.id !== id)
+  );
+
+}
+
+}
+

@@ -1,4 +1,23 @@
-<p>property-panel works!</p>
 <h2>Properties</h2>
 
+@if (simulationService.selectedEntity(); as entity) {
+
+<p><b>Name:</b> {{ entity.name }}</p>
+
+<p><b>Type:</b> {{ entity.type }}</p>
+
+<p><b>Latitude:</b> {{ entity.position.latitude }}</p>
+
+<p><b>Longitude:</b> {{ entity.position.longitude }}</p>
+
+<button (click)="removeSelected()">
+    Delete Entity
+</button>
+
+}
+
+@else {
+
 <p>No entity selected.</p>
+
+}
