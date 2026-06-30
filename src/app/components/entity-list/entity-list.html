@@ -6,8 +6,8 @@
 
 <div
     class="entity-card"
-    (mouseenter)="simulationService.hoveredTemplate.set(aircraft)"
-    (mouseleave)="simulationService.hoveredTemplate.set(null)"
+    (mouseenter)="showCard(aircraft)"
+    (mouseleave)="hideCard()"
     (click)="select(aircraft)"
 >
 
@@ -27,8 +27,8 @@
 
 <div
     class="entity-card"
-    (mouseenter)="simulationService.hoveredTemplate.set(radar)"
-    (mouseleave)="simulationService.hoveredTemplate.set(null)"
+    (mouseenter)="showCard(radar)"
+    (mouseleave)="hideCard()"
     (click)="select(radar)"
 >
 
@@ -47,3 +47,42 @@
 <p>Select <b>Aircraft</b> or <b>Radar</b> from the toolbar.</p>
 
 }
+
+<hr>
+
+@if (simulationService.selectedEntity(); as entity) {
+
+<h3>Properties</h3>
+
+<p><b>Name:</b> {{ entity.name }}</p>
+
+<p><b>Type:</b> {{ entity.type }}</p>
+
+<p><b>Latitude:</b> {{ entity.position.latitude }}</p>
+
+<p><b>Longitude:</b> {{ entity.position.longitude }}</p>
+
+ @if (isAircraft(entity)) {
+
+<p><b>Altitude:</b> {{ aircraft(entity).position.altitude }}</p>
+
+<p><b>Speed:</b> {{ aircraft(entity).speed }}</p>
+
+<p><b>Heading:</b> {{ aircraft(entity).heading }}</p>
+
+}
+
+@if (isRadar(entity)) {
+
+<p><b>Range:</b> {{ radar(entity).range }}</p>
+
+}
+
+<button (click)="deleteSelected()">
+    Delete
+</button>
+
+}
+
+
+

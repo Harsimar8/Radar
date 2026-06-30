@@ -6,6 +6,10 @@ import { EditorTool } from '../../core/enums/EditorTool';
 
 import { AIRCRAFT_LIBRARY } from '../../core/data/aircraft-library';
 import { RADAR_LIBRARY } from '../../core/data/radar-library';
+import { Radar } from '../../core/models/Radar';
+import { Aircraft } from '../../core/models/Aircraft';
+import { EntityType } from '../../core/enums/EntityType';
+import { EntityService } from '../../services/entity.service';
 
 @Component({
   selector: 'app-entity-list',
@@ -17,17 +21,63 @@ import { RADAR_LIBRARY } from '../../core/data/radar-library';
 export class EntityList {
 
   EditorTool = EditorTool;
+  hoveredItem: any = null;
+  
 
   aircraftList = AIRCRAFT_LIBRARY;
 
   radarList = RADAR_LIBRARY;
 
   constructor(
-    public simulationService: SimulationService
-  ) {}
+  public simulationService: SimulationService,
+  private entityService: EntityService
+) {}
 
   select(item: any) {
     this.simulationService.selectedTemplate.set(item);
   }
 
+   showCard(item: any) {
+
+  this.hoveredItem = item;
+
+}
+
+hideCard() {
+
+  this.hoveredItem = null;
+
+}
+
+readonly EntityType = EntityType;
+
+isAircraft(entity: any): boolean {
+  return entity.type === EntityType.Aircraft;
+}
+
+isRadar(entity: any): boolean {
+  return entity.type === EntityType.Radar;
+}
+
+aircraft(entity: any): Aircraft {
+  return entity as Aircraft;
+}
+
+radar(entity: any): Radar {
+  return entity as Radar;
+}
+
+deleteSelected() {
+
+  const entity = this.simulationService.selectedEntity();
+
+  if (!entity) {
+    return;
+  }
+
+  this.entityService.removeEntity(entity.id);
+
+  this.simulationService.selectEntity(null);
+
+}
 }

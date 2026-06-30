@@ -12,9 +12,8 @@ import { StatusBar } from './components/status-bar/status-bar';
   imports: [
     Toolbar,
     MapComponent,
-    PropertyPanel,
     EntityList,
-    StatusBar
+    StatusBar,
   ],
   templateUrl: './app.html',
   styleUrl: './app.css'

@@ -5,7 +5,26 @@
 }
 
 .map-container {
+    display: flex;
     width: 100%;
     height: 100%;
-    background: #d9d9d9;
+    overflow: hidden;
+}
+
+.leaflet-panel {
+    flex: 1;
+    border-right: 1px solid #cccccc;
+    overflow: hidden;
+}
+
+.cesium-panel {
+    flex: 1;
+    overflow: hidden;
+}
+
+app-leaflet-map,
+app-cesium-map {
+    display: block;
+    width: 100%;
+    height: 100%;
 }

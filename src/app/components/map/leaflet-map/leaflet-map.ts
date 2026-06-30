@@ -5,6 +5,7 @@ import {
 } from '@angular/core';
 
 import * as L from 'leaflet';
+import { MapSyncService } from '../../../services/map-sync.service';
 
 import { SimulationService } from '../../../services/simulation.service';
 import { EntityService } from '../../../services/entity.service';
@@ -44,10 +45,11 @@ export class LeafletMap implements AfterViewInit {
     iconAnchor: [16, 16]
   });
 
-  constructor(
-    public simulationService: SimulationService,
-    private entityService: EntityService
-  ) {
+    constructor(
+  public simulationService: SimulationService,
+  private entityService: EntityService,
+  private mapSyncService: MapSyncService
+) {
 
     effect(() => {
 
@@ -86,6 +88,18 @@ export class LeafletMap implements AfterViewInit {
       [20.5937, 78.9629],
       5
     );
+
+    this.map.on('moveend zoomend', () => {
+
+  const center = this.map.getCenter();
+
+  this.mapSyncService.update(
+    center.lat,
+    center.lng,
+    this.map.getZoom()
+  );
+
+});
 
   }
 
@@ -227,9 +241,11 @@ export class LeafletMap implements AfterViewInit {
 
 marker.bindPopup(entity.name);
 
-marker.on('click', () => {
+marker.on('mouseover', () => {
   this.simulationService.selectEntity(entity);
 });
+
+
 
 marker.addTo(this.markers);
 

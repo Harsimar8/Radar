@@ -15,8 +15,18 @@ body {
 
 .workspace {
     flex: 1;
-
     display: flex;
-
     overflow: hidden;
+}
+
+app-entity-list {
+    width: 260px;
+    min-width: 260px;
+    border-right: 1px solid #cccccc;
+    display: block;
+}
+
+app-map {
+    flex: 1;
+    display: block;
 }

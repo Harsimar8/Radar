@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 import * as Cesium from 'cesium';
+import { MapSyncService } from '../../../services/map-sync.service';
 
 import { SimulationService } from '../../../services/simulation.service';
 import { EntityService } from '../../../services/entity.service';
@@ -38,55 +39,94 @@ implements AfterViewInit, OnDestroy {
 
   private simulationService = inject(SimulationService);
 
+  private mapSyncService = inject(MapSyncService);
+
   constructor() {
 
-    effect(() => {
+   effect(() => {
 
-      this.entityService.entities();
-      console.log("Redrawing Cesium");
+  const camera = this.mapSyncService.center();
 
-      if (!this.viewer) return;
+  if (!this.viewer) return;
 
-      this.viewer.entities.removeAll();
+  const zoom = camera.zoom;
 
-      this.drawEntities();
+  const height =
+    Math.max(500, 20000000 / Math.pow(2, zoom));
 
-    });
+  this.viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(
+      camera.longitude,
+      camera.latitude,
+      height
+    )
+  });
+
+});
+
+effect(() => {
+
+  // Listen for entity changes
+  this.entityService.entities();
+
+  if (!this.viewer) {
+    return;
+  }
+
+  console.log("Refreshing Cesium...");
+
+  this.viewer.entities.removeAll();
+
+  this.drawEntities();
+
+});
 
   }   // <-- constructor ends here
 
-  ngAfterViewInit(): void {
+   ngAfterViewInit(): void {
 
-    this.viewer = new Cesium.Viewer('cesiumContainer', {
+    Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzY2ZiMTI4MC0yODcxLTRhN2MtYTVmNi01MmFlYThjMzllODIiLCJpZCI6NDQyMjYxLCJzdWIiOiJIYXJzaW1hcjA4IiwiaXNzIjoiaHR0cHM6Ly9hcGkuY2VzaXVtLmNvbSIsImF1ZCI6IlVudGl0bGVkIiwiaWF0IjoxNzgyODAxMjQwfQ.FCFiKY8xR6oixiTfcg9AaQLL3Xb4IidcE-9aInSeQ88";
 
-      animation: false,
-      timeline: false,
-      homeButton: true,
-      sceneModePicker: true,
-      baseLayerPicker: true,
-      navigationHelpButton: false,
-      geocoder: false
+this.viewer = new Cesium.Viewer("cesiumContainer", {
+  terrain: Cesium.Terrain.fromWorldTerrain(),
+  animation: false,
+  timeline: false,
+  homeButton: true,
+  sceneModePicker: true,
+  baseLayerPicker: true,
+  navigationHelpButton: false,
+  geocoder: false,
+});
 
-    });
 
-    this.viewer.camera.flyTo({
+console.log(this.viewer);
+console.log(this.viewer.scene);
+console.log(this.viewer.scene.globe);
+console.log(this.viewer.scene.terrainProvider);
+  this.viewer.scene.globe.depthTestAgainstTerrain = false;
+this.viewer.scene.globe.maximumScreenSpaceError = 1.5;
+this.viewer.scene.requestRenderMode = false;
+this.viewer.scene.globe.depthTestAgainstTerrain = false;
+this.viewer.scene.globe.maximumScreenSpaceError = 1.5;
 
-      destination: Cesium.Cartesian3.fromDegrees(
-        78.9629,
-        20.5937,
-        3000000
-      )
+this.viewer.scene.screenSpaceCameraController.minimumZoomDistance = 200;
+this.viewer.scene.screenSpaceCameraController.maximumZoomDistance = 20000000;
+   
+  this.viewer.camera.flyTo({
+  destination: Cesium.Cartesian3.fromDegrees(
+    86.9250,
+    27.9881,
+    12000
+  )
+});
 
-    });
+  this.initializeClickHandler();
 
-    this.initializeClickHandler();
+  this.initializeSelectionHandler();
 
-    this.initializeSelectionHandler();
+  this.drawEntities();
 
-    this.drawEntities();
-
-  }
-
+}
   private initializeClickHandler(): void {
 
   const handler = new Cesium.ScreenSpaceEventHandler(
@@ -194,9 +234,45 @@ if (!cartesian) return;
 
 }
 
-  private initializeSelectionHandler(): void {
+    private initializeSelectionHandler(): void {
 
-  }
+  const handler = new Cesium.ScreenSpaceEventHandler(
+    this.viewer.scene.canvas
+  );
+
+  handler.setInputAction((movement: any) => {
+
+    const picked = this.viewer.scene.pick(
+      movement.endPosition
+    );
+
+    if (!Cesium.defined(picked)) {
+
+      this.simulationService.selectEntity(null);
+
+      return;
+
+    }
+
+    const pickedEntity = picked.id;
+
+    if (!pickedEntity?.id) {
+      return;
+    }
+
+    const entity = this.entityService
+      .entities()
+      .find(e => e.id === pickedEntity.id);
+
+    if (entity) {
+
+      this.simulationService.selectEntity(entity);
+
+    }
+
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+}
 
   private drawEntity(entity: Entity): void {
 
@@ -218,6 +294,12 @@ if (!cartesian) return;
 
       point: {
         pixelSize: 12,
+scaleByDistance: new Cesium.NearFarScalar(
+  1.0e2,
+  1.5,
+  1.0e7,
+  0.8
+),
         color: Cesium.Color.BLUE
       },
 
@@ -248,7 +330,13 @@ if (!cartesian) return;
       ),
 
       point: {
-        pixelSize: 14,
+        pixelSize: 12,
+scaleByDistance: new Cesium.NearFarScalar(
+  1.0e2,
+  1.5,
+  1.0e7,
+  0.8
+),
         color: Cesium.Color.RED
       },
 
@@ -268,18 +356,17 @@ if (!cartesian) return;
       ),
 
       ellipse: {
+    semiMajorAxis: radar.range,
+    semiMinorAxis: radar.range,
 
-        semiMajorAxis: radar.range,
+    height: 0,
 
-        semiMinorAxis: radar.range,
+    material: Cesium.Color.RED.withAlpha(0.2),
 
-        material: Cesium.Color.RED.withAlpha(0.20),
+    outline: true,
 
-        outline: true,
-
-        outlineColor: Cesium.Color.RED
-
-      }
+    outlineColor: Cesium.Color.RED
+}
 
     });
 
@@ -305,5 +392,30 @@ if (!cartesian) return;
     }
 
   }
+
+
+  private getCameraHeight(zoom: number): number {
+
+  switch (zoom) {
+    case 1: return 20000000;
+    case 2: return 10000000;
+    case 3: return 5000000;
+    case 4: return 2500000;
+    case 5: return 1200000;
+    case 6: return 600000;
+    case 7: return 300000;
+    case 8: return 150000;
+    case 9: return 75000;
+    case 10: return 40000;
+    case 11: return 20000;
+    case 12: return 10000;
+    case 13: return 5000;
+    case 14: return 2500;
+    case 15: return 1200;
+    case 16: return 600;
+    default: return 300;
+  }
+
+}
 
 }

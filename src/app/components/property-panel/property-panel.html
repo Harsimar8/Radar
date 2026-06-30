@@ -1,8 +1,6 @@
-<h2>Properties</h2>
-
 @if (simulationService.selectedEntity(); as entity) {
 
-<p><b>Name:</b> {{ entity.name }}</p>
+<h2>{{ entity.name }}</h2>
 
 <p><b>Type:</b> {{ entity.type }}</p>
 
@@ -13,11 +11,5 @@
 <button (click)="removeSelected()">
     Delete Entity
 </button>
-
-}
-
-@else {
-
-<p>No entity selected.</p>
 
 }
