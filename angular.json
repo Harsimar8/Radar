@@ -19,11 +19,16 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+  {
+    "glob": "**/*",
+    "input": "public"
+  },
+  {
+    "glob": "**/*",
+    "input": "node_modules/cesium/Build/Cesium",
+    "output": "cesium"
+  }
+],
             "styles": [
   "node_modules/cesium/Build/Cesium/Widgets/widgets.css",
   "src/styles.css"
